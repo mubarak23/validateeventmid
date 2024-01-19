@@ -5,15 +5,6 @@ import (
 	"net/http"
 )
 
-// type RequestPayload struct {
-// 	ID 		string `json:"id"`
-// 	PubKey string `json:"pubkey"`
-// 	CreatedAt int64          `json:"created_at"`
-// 	Kind      int            `json:"kind"`
-// 	Tags      [][]interface{} `json:"tags"`
-// 	Content   string         `json:"content"`
-// 	Sig       string         `json:"sig"`
-// }
 
 type RequestPayload struct {
 	ID        string         `json:"id"`
