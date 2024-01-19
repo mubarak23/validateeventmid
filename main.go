@@ -22,6 +22,8 @@ type RequestPayload struct {
 	Kind      int            `json:"kind"`
 	Ta        string         `json:"ta"`
 	Amt       float64         `json:"amt"`
+	Addr      string         `json:"addr"`
+	Fee       float64         `json:"fee"`
 	Content   string         `json:"content"`
 	Sig       string         `json:"sig"`
 }
@@ -38,6 +40,19 @@ func validateNoStrEventMiddleware (next func(http.ResponseWriter, *http.Request,
 			http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
 			return
 		}
+
+			// check for TAHUB_CREATE_USER
+		if payload.Kind == 1 && payload.Content == "TAHUB_CREATE_USER" {
+				next(w,r, payload)
+				return 
+			}
+	
+	
+			// check for TAHUB_GET_BALANCES
+		if payload.Kind == 1 && payload.Content == "TAHUB_GET_BALANCES" {
+				next(w,r, payload)
+				return 
+			}
 
 		// create TAHUB_RECEIVE_ADDRESS_FOR_ASSET event 
 		if payload.Kind == 1 && payload.Content == "TAHUB_RECEIVE_ADDRESS_FOR_ASSET" {
@@ -65,17 +80,30 @@ func validateNoStrEventMiddleware (next func(http.ResponseWriter, *http.Request,
 				return
 		}
 
-		// check for TAHUB_CREATE_USER
-		if payload.Kind == 1 && payload.Content == "TAHUB_CREATE_USER" {
-			next(w,r, payload)
-			return 
-		}
+			// create TAHUB_SEND_ASSET event 
+			if payload.Kind == 1 && payload.Content == "TAHUB_SEND_ASSET" {
+			
+	
+				if len(payload.Addr) == 0 {
+					http.Error(w, "Field 'addr' must exist and not be empty", http.StatusBadRequest)
+					return
+				}
+
+				if payload.Addr == "" {
+					http.Error(w, "Field 'addr' must be a non-empty string", http.StatusBadRequest)
+					return
+				}
 
 
-		// check for TAHUB_GET_BALANCES
-		if payload.Kind == 1 && payload.Content == "TAHUB_GET_BALANCES" {
-			next(w,r, payload)
-			return 
+				if payload.Fee < 0 || payload.Fee != float64(int64(payload.Fee)) {
+					http.Error(w, "Field 'amt' must be a positive integer (u64)", http.StatusBadRequest)
+					return
+				}
+	
+	
+				// If conditions are met, proceed to the next handler
+				next(w, r, payload)
+				return
 		}
 
 			// Otherwise, return an error response
