@@ -58,7 +58,7 @@ func TestValidateNoStrEventMiddleware(t *testing.T) {
 			},
 			expected: http.StatusBadRequest,
 		},
-		// Add more test cases as needed
+	
 	}
 
 	for _, test := range tests {
@@ -69,7 +69,6 @@ func TestValidateNoStrEventMiddleware(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(handler))
 			defer server.Close()
 
-			// Create a request with the test payload
 			requestBody, err := json.Marshal(test.payload)
 			if err != nil {
 				t.Fatal(err)
@@ -81,7 +80,7 @@ func TestValidateNoStrEventMiddleware(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			// Check the response status code
+			
 			if resp.StatusCode != test.expected {
 				t.Errorf("Expected status code %d, got %d", test.expected, resp.StatusCode)
 			}
